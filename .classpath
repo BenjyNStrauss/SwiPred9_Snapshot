@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-11">
+		<attributes>
+			<attribute name="module" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/Users/bns/workspace/SwiPred9/files/jars/forester.jar"/>
+	<classpathentry kind="lib" path="/Users/bns/workspace/SwiPred9/files/jars/h2-2.1.214.jar"/>
+	<classpathentry kind="lib" path="/Users/bns/workspace/SwiPred9/files/jars/jhdf5-2.9.jar"/>
+	<classpathentry kind="lib" path="/Users/bns/workspace/SwiPred9/files/jars/scala-library-2.9.2.jar"/>
+	<classpathentry kind="lib" path="/Users/bns/workspace/SwiPred9/files/tools/HDF5-1.14.3-Darwin/HDF_Group/HDF5/1.14.3/lib/jarhdf5-1.14.3.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/TrigamonUtilities"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/SwiPredNNTools"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

@@ -1,0 +1,4 @@
+Start with: ./bin/run_scratch1d_predictors.sh
+	(doesn't exist prior to compile!)
+
+
