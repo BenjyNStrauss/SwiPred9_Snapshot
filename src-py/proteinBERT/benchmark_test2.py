@@ -3,6 +3,8 @@ Created on Mar 7, 2024
 
 @author: Benjamin Strauss
 see: https://github.com/nadavbra/protein_bert/blob/master/ProteinBERT%20demo.ipynb
+
+LOOK in saved/swipredbert/swipredbert-v2-model3 for model3 output!
 '''
 
 import os
@@ -19,13 +21,12 @@ from proteinBERT import OutputType, OutputSpec, FinetuningModelGenerator, load_p
 from proteinBERT.conv_and_global_attention_model import get_model_with_hidden_layers_as_outputs
 from proteinBERT.shared_utils.util import start_log
 from proteinBERT.visualizer import main
-from proteinBERT.pretrain_proteinbert_sp import SAVE_PATH
+
+from proteinBERT import save_file_manager
 
 MODEL_EPOCHS = 196
-#FINE_TUNING = 4
 
 os.chdir("../..")
-#swipredbert_model_dir = "files/proteinbert-models/"+REDUNDANCY
 
 keys = [ "p", "ps8", "ps3", "s8", "s3", "pbert" ]
 
@@ -36,9 +37,9 @@ BENCHMARKS = [
     ('superfamily',                  OutputType(False, 'categorical')),
 ]
 
-start_runs = 43 #how many models have been completed by previous iterations, set manually
-runs = 0 
-max_runs = 72 #2*2*3*6
+start_runs = 0 #how many models have been completed by previous iterations, set manually
+runs = 0 #do not change from 0
+max_runs = 72 #2*2*3*6  DO NOT CHANGE!
 
 settings = {
     'max_dataset_size': None,
@@ -163,6 +164,12 @@ def get_benchmark_output_type(benchmark_name):
             return output_type
 
 if __name__ == '__main__':
+    
+    #os.makedirs("input/swipredbert/benchmarks/nr-unp", exist_ok=True)
+    #os.makedirs("input/swipredbert/benchmarks/wr-unp", exist_ok=True)
+    #os.makedirs("input/swipredbert/benchmarks/nr-pdb", exist_ok=True)
+    #os.makedirs("input/swipredbert/benchmarks/wr-pdb", exist_ok=True)
+    
     for database in ["pdb", "unp"]:
         for redundancy in ["nr", "wr"]:
             start_msg = "Starting: "+database+"-"+redundancy
@@ -181,22 +188,17 @@ if __name__ == '__main__':
             log("dropout_rate:         "+str(settings["dropout_rate"]))
             log("final_epoch_seq_len:  "+str(settings["final_epoch_seq_len"]))
             
-            swipredbert_model_dir = SAVE_PATH+redundancy
+            swipredbert_model_dir = save_file_manager.SAVE_PATH+"/"
             
             for key in keys:
                 log("**** Using Key: "+key+" ****")
                 
-                model_dump_file_name = key+"/epoch_"+str(MODEL_EPOCHS)
-                
-                if database == "pdb":
-                    model_dump_file_name += "_dssp.pkl"
-                else:
-                    model_dump_file_name += ".pkl"
+                save_file_manager.GLOBAL_ACTIVE_SAVE_FILE = save_file_manager.SPBertSaveFile(key, database, MODEL_EPOCHS, redundancy)
                 
                 #load pretrained model
                 pretrained_model_generator, input_encoder = load_pretrained_model(
                     local_model_dump_dir = swipredbert_model_dir,
-                    local_model_dump_file_name = model_dump_file_name)
+                    local_model_dump_file_name = save_file_manager.GLOBAL_ACTIVE_SAVE_FILE.getFileName())
                 
                 #run the benchmark
                 for benchmark_name, _ in BENCHMARKS:
@@ -206,7 +208,7 @@ if __name__ == '__main__':
                                 get_model_with_hidden_layers_as_outputs, tokenType=key+"token-")
                         
                         test_set_path = benchmarksDir(redundancy, database) + key + "token-" + benchmark_name + ".test.csv"
-                        main(pretrained_model_generator, test_set_path, model_gen, swipredbert_model_dir, model_dump_file_name)
+                        main(pretrained_model_generator, test_set_path, model_gen, swipredbert_model_dir, save_file_manager.GLOBAL_ACTIVE_SAVE_FILE.getFileName())
                     
                         log("**** Finished Model #"+str(runs)+" ****")
                         gc.collect()

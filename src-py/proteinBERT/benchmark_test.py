@@ -3,6 +3,7 @@ Created on Mar 7, 2024
 
 @author: Benjamin Strauss
 see: https://github.com/nadavbra/protein_bert/blob/master/ProteinBERT%20demo.ipynb
+@deprecated: 8/21/2024
 '''
 
 import os
@@ -182,12 +183,12 @@ if __name__ == '__main__':
             for key in keys:
                 log("**** Using Key: "+key+" ****")
                 
-                model_dump_file_name = key+"/epoch_"+str(MODEL_EPOCHS)
+                model_dump_file_name = key+"_epoch_"+str(MODEL_EPOCHS)
                 
                 if database == "pdb":
                     model_dump_file_name += "_dssp.pkl"
                 else:
-                    model_dump_file_name += ".pkl"
+                    model_dump_file_name += "_unp.pkl"
                 
                 #load pretrained model
                 pretrained_model_generator, input_encoder = load_pretrained_model(

@@ -19,6 +19,7 @@ from .shared_utils.util import log
 #comment this to trace how to do the language modification
 from .tokenization import ADDED_TOKENS_PER_SEQ, additional_token_to_index, n_tokens, tokenize_seq, parse_seq, assertNoNegatives, sp_debug_log
 from .model_generation import PretrainingModelGenerator
+from proteinBERT import save_file_manager
 
 DEFAULT_EPISODE_SETTINGS = [
     # seq_len, batch_size
@@ -32,6 +33,10 @@ DEBUG = False
 #Benjy-edited
 def run_pretraining(create_model_function, epoch_generator, h5_dataset_file_path, create_model_kwargs = {}, optimizer_class = keras.optimizers.Adam, lr = 2e-04, \
         other_optimizer_kwargs = {}, annots_loss_weight = 1, autosave_manager = None, weights_dir = None, resume_from = None, n_epochs = None, fit_callbacks = []):
+
+    if save_file_manager.GLOBAL_ACTIVE_SAVE_FILE is None:
+        print("GLOBAL_ACTIVE_SAVE_FILE is None!!!")
+        exit(1)
 
     np.random.seed(0)
     
@@ -68,7 +73,7 @@ class ModelTrainer:
             self.autosave_manager.n_annotations = self.model_generator.n_annotations
         
     def setup(self, dataset_handler, resume_from = None):
-        #print("flag 2.1")
+        #print("flag 2.1 - pretraining.setup")
         
         if resume_from is None:
             self.current_epoch_index = 0
@@ -77,7 +82,8 @@ class ModelTrainer:
         else:
             self.current_epoch_index, start_sample_index = resume_from
             self.current_epoch_index += 1
-            resumed_weights_file_path = os.path.join(self.weights_dir, 'epoch_%d_sample_%d.pkl' % resume_from)
+            save_file_manager.GLOBAL_ACTIVE_SAVE_FILE.epochs = resume_from
+            resumed_weights_file_path = os.path.join(self.weights_dir, save_file_manager.GLOBAL_ACTIVE_SAVE_FILE.getFileName())
         
         starting_episode = self.epoch_generator.setup(dataset_handler, start_sample_index)
         self.model_generator.dummy_epoch = self.epoch_generator.create_dummpy_epoch()[:2]
@@ -386,7 +392,9 @@ class AutoSaveManager:
             return
         
         #Benjy TODO - apply edits
-        save_path = os.path.join(self.directory, 'epoch_%d_sample_%d.pkl' % (epoch_index, sample_index))
+        save_file_manager.GLOBAL_ACTIVE_SAVE_FILE.epochs = epoch_index
+        save_file_manager.GLOBAL_ACTIVE_SAVE_FILE.sample = sample_index
+        save_path = os.path.join(self.directory, save_file_manager.GLOBAL_ACTIVE_SAVE_FILE.getFileName())
         _save_model_state(model, self.n_annotations, save_path)
         self.n_saves += 1
         
